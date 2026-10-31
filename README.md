@@ -9,7 +9,7 @@ This project grew out of Terra Obscura. The original demonstration mapped SAE fe
 - The real representation is the VAE posterior mean after fixed image preprocessing, flattened and L2 normalized. The default 512 px encoding produces 16,384 values for the supported VAEs.
 - PCA is fitted **only on reference images**. Its three coordinates are a lossy view; axes have no intrinsic meaning.
 - Novelty is mean cosine distance to the five nearest reference fingerprints, calculated before PCA. Reference points exclude themselves. A held-out calibration set supplies an exploratory 99th-percentile threshold.
-- The blue mesh is a **3D convex hull**, not an exact multidimensional boundary. It bridges gaps, including places with no samples. Its inside/outside appearance may disagree with full-space scores.
+- The monochrome wireframe is a **3D convex hull**, not an exact multidimensional boundary. It bridges gaps, including places with no samples. Its inside/outside appearance may disagree with full-space scores.
 - VAE distances retain spatial structure; they are **not validated semantic distances**, an impossibility test, or a measure of safety. Small calibration datasets cannot support strong coverage claims.
 - Imported images are encoded, not inverted to recover their original noise or diffusion trajectory. Encoding the finished image is not identical to recovering the latent from which it was decoded.
 

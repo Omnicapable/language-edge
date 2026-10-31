@@ -22,7 +22,7 @@ If an 8 px shift scores comparably to an unrelated image, or full/3D neighbours 
 
 ## Surface and display
 
-The optional blue mesh is the convex hull of the projected reference states. It contains unobserved gaps and does not encode the kNN decision boundary. The map is a lossy projection; omitted dimensions can make a nearby point have high full-space novelty. All coordinates are display coordinates. Full-space cosine distance and the projected mesh must not be presented as interchangeable.
+The optional monochrome wireframe is the convex hull of the projected reference states. It contains unobserved gaps and does not encode the kNN decision boundary. The map is a lossy projection; omitted dimensions can make a nearby point have high full-space novelty. All coordinates are display coordinates. Full-space cosine distance and the projected mesh must not be presented as interchangeable.
 
 ## References
 

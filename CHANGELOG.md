@@ -1,5 +1,11 @@
 # Changelog
 
+## Monochrome interface update — 31 October 2026
+
+- Changed the interface and coverage mesh to black, white and neutral gray.
+- Distinguished point groups with circles, squares, triangles and outlined diamonds, with a ring for selection.
+- Renamed the mesh toggle to Coverage envelope. Image previews retain their original colors for inspection.
+
 ## 0.1.0 local beta — 31 October 2026
 
 ### Implemented

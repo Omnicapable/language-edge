@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id), canvas=$('canvas'),ctx=canvas.getContext('2d');
 let state={runs:[],job:{}},token='',map=null,current='',selected=null,promptText='',promptSuffix='.csv',signature='';
 let yaw=.45,pitch=-.2,zoom=1,drag=null,moved=false,screen=[],lastSize='';
-const colors={reference:'#69baf4',calibration:'#d9e8b0',evaluation:'#b798ec',query:'#ffb073'};
+const colors={reference:'#f5f5f5',calibration:'#aaaaaa',evaluation:'#888888',query:'#ffffff'};
 function error(e){$('error').textContent=e.message||String(e)}
 async function api(path,body){let r=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json','X-LE-Token':token},body:JSON.stringify(body)}:{});let v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v}
 async function action(path,body){$('error').textContent='';try{await api(path,body);await poll()}catch(e){error(e)}}
@@ -37,8 +37,8 @@ function transform(v,center,scale,w,h){let x=(v[0]-center[0])*scale,y=(v[1]-cent
 function draw(){let box=canvas.getBoundingClientRect(),w=box.width,h=box.height,dpr=Math.min(devicePixelRatio||1,2);if(lastSize!==`${w},${h},${dpr}`){canvas.width=w*dpr;canvas.height=h*dpr;lastSize=`${w},${h},${dpr}`}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);screen=[];if(!map)return;
  const positions=map.points.filter(p=>p.role==='reference').map(p=>p.position),lo=[0,1,2].map(i=>Math.min(...positions.map(p=>p[i]))),hi=[0,1,2].map(i=>Math.max(...positions.map(p=>p[i]))),center=lo.map((x,i)=>(x+hi[i])/2),scale=Math.min(w,h)*.68/Math.max(...hi.map((x,i)=>x-lo[i]),.01);
  const view=v=>transform(v,center,scale,w,h);
- if($('mesh').checked&&map.mesh.faces.length){const vertices=map.mesh.vertices.map(view),faces=map.mesh.faces.map(f=>({p:f.map(i=>vertices[i]),z:f.reduce((s,i)=>s+vertices[i].z,0)/3})).sort((a,b)=>a.z-b.z);ctx.lineWidth=.6;for(let f of faces){ctx.beginPath();f.p.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='rgba(71,155,217,.025)';ctx.strokeStyle='rgba(105,186,244,.20)';ctx.fill();ctx.stroke()}}
- screen=map.points.map(p=>({...view(p.position),point:p})).sort((a,b)=>a.z-b.z);for(let p of screen){ctx.beginPath();ctx.arc(p.x,p.y,p.point.id===selected?6:p.point.role==='query'?4.5:3.2,0,Math.PI*2);ctx.fillStyle=colors[p.point.role]||'#fff';ctx.fill();if(p.point.id===selected){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke()}}
+ if($('mesh').checked&&map.mesh.faces.length){const vertices=map.mesh.vertices.map(view),faces=map.mesh.faces.map(f=>({p:f.map(i=>vertices[i]),z:f.reduce((s,i)=>s+vertices[i].z,0)/3})).sort((a,b)=>a.z-b.z);ctx.lineWidth=.6;for(let f of faces){ctx.beginPath();f.p.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='rgba(255,255,255,.025)';ctx.strokeStyle='rgba(220,220,220,.24)';ctx.fill();ctx.stroke()}}
+ screen=map.points.map(p=>({...view(p.position),point:p})).sort((a,b)=>a.z-b.z);for(let p of screen){const role=p.point.role,r=role==='query'?5:3.5;ctx.beginPath();if(role==='calibration'){ctx.rect(p.x-r,p.y-r,2*r,2*r)}else if(role==='evaluation'){ctx.moveTo(p.x,p.y-r-1);ctx.lineTo(p.x+r+1,p.y+r);ctx.lineTo(p.x-r-1,p.y+r);ctx.closePath()}else if(role==='query'){ctx.moveTo(p.x,p.y-r);ctx.lineTo(p.x+r,p.y);ctx.lineTo(p.x,p.y+r);ctx.lineTo(p.x-r,p.y);ctx.closePath()}else{ctx.arc(p.x,p.y,r,0,Math.PI*2)}ctx.fillStyle=role==='query'?'#111111':colors[role]||'#fff';ctx.fill();if(role==='query'){ctx.strokeStyle='#fff';ctx.lineWidth=1.3;ctx.stroke()}if(p.point.id===selected){ctx.beginPath();ctx.arc(p.x,p.y,9,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke()}}
 }
 function hit(x,y){return [...screen].reverse().find(p=>Math.hypot(p.x-x,p.y-y)<10)}
 canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY};moved=false;canvas.setPointerCapture(e.pointerId)};

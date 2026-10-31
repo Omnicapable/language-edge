@@ -75,6 +75,7 @@ item('Representation finding', 'SDXL Turbo re-encoding was exactly repeatable in
 item('Distribution and remaining verification', 'The source release and demo are prepared locally; model weights and private run folders are excluded. Mac hardware execution, remote CI, 10000 prompt performance, large held out calibration and artistic usefulness remain unverified. Public GitHub publication needs a destination and account access. The proposed MIT code license does not replace model terms.')
 h('Maintaining this record')
 p('CHANGELOG.md tracks source changes. The reports folder contains the audit, numerical pilot measurements and integration results. This Word document is the readable plan and project summary. Add dated entries when behavior, evidence, scope or release status changes; do not mark planned or unverified work as complete.')
+p('UI update on 31 October: the interface and wireframe now use black, white and gray. Point shapes distinguish groups. Image previews retain their original colors. A short start guide is included with the release.')
 
 out = ROOT / 'Language Edge Plan and Changelog.docx'
 doc.save(out)
