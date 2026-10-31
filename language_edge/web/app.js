@@ -1,0 +1,48 @@
+'use strict';
+const $=id=>document.getElementById(id), canvas=$('canvas'),ctx=canvas.getContext('2d');
+let state={runs:[],job:{}},token='',map=null,current='',selected=null,promptText='',promptSuffix='.csv',signature='';
+let yaw=.45,pitch=-.2,zoom=1,drag=null,moved=false,screen=[],lastSize='';
+const colors={reference:'#69baf4',calibration:'#d9e8b0',evaluation:'#b798ec',query:'#ffb073'};
+function error(e){$('error').textContent=e.message||String(e)}
+async function api(path,body){let r=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json','X-LE-Token':token},body:JSON.stringify(body)}:{});let v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v}
+async function action(path,body){$('error').textContent='';try{await api(path,body);await poll()}catch(e){error(e)}}
+function runName(){if(!$('run').value)throw Error('Choose a workspace first.');return $('run').value}
+async function poll(){try{state=await api('/api/state');token=state.token;let old=$('run').value;
+  const list=JSON.stringify(state.runs);if(list!==signature){signature=list;$('run').replaceChildren(new Option('Choose a workspace',''));state.runs.forEach(r=>$('run').add(new Option(`${r.name} · ${r.count} images${r.built?' · mapped':''}`,r.name)));$('run').value=old;if(!old&&state.runs.length===1)$('run').value=state.runs[0].name}
+  $('job-text').textContent=state.job.message;$('job').classList.toggle('running',state.job.status==='running');$('stop').hidden=state.job.status!=='running';
+  let r=state.runs.find(r=>r.name===$('run').value),busy=state.job.status==='running';
+  for(let id of ['generate','build','generate-query','create'])$(id).disabled=busy||(id!=='create'&&!r);
+  $('generate').disabled=busy||!r||r.built;$('build').disabled=busy||!r||r.built||r.count<6;$('generate-query').disabled=busy||!r?.built;$('images').disabled=busy||!r?.built;
+  if(state.job.status==='error')$('error').textContent=state.job.message;
+  if(current!==$('run').value){current=$('run').value;map=null;selected=null;$('selection').hidden=true;$('selection-empty').hidden=false;await loadMap()}
+  else if(r?.built&&!map){await loadMap()}
+  else if(state.job.status==='complete'&&window.lastCompleteId!==state.job.id){await loadMap();window.lastCompleteId=state.job.id}
+}catch(e){$('job-text').textContent='Connection lost. Check that the local server is running.'}}
+async function loadMap(){const r=state.runs.find(r=>r.name===current);if(r?.built){map=await api('/api/map/'+encodeURIComponent(current));$('map-title').textContent=current;$('empty').hidden=true;$('download').disabled=false;$('variance').textContent=`3D retains ${(map.variance.reduce((a,b)=>a+b,0)*100).toFixed(1)}% of reference variance`;$('stats').textContent=`${map.reference_count} reference · ${map.calibration_count} calibration · ${map.points.length} total. ${map.calibration_count<100?'Small calibration set: scores are exploratory.':''}`;}else{map=null;$('map-title').textContent=current||'Your next territory';$('empty').hidden=false;$('download').disabled=true;$('stats').textContent=''}draw()}
+$('run').addEventListener('change',poll);
+$('open-create').onclick=()=>{$('create-panel').hidden=!$('create-panel').hidden};
+$('create').onclick=async()=>{let name=$('name').value.trim();await action('/api/create',{name,model:$('model').value,source:$('source').value.trim()});if(state.runs.some(r=>r.name===name)){$('run').value=name;$('create-panel').hidden=true;await poll()}};
+$('prompts').onchange=async e=>{let f=e.target.files[0];if(f){promptText=await f.text();promptSuffix=f.name.endsWith('.jsonl')?'.jsonl':'.csv';$('prompt-name').textContent=f.name}};
+$('generate').onclick=()=>{try{if(!promptText)throw Error('Choose a prompt file first.');action('/api/generate',{name:runName(),text:promptText,suffix:promptSuffix,seeds:$('seeds').value})}catch(e){error(e)}};
+$('build').onclick=()=>{try{action('/api/build',{name:runName()})}catch(e){error(e)}};
+$('generate-query').onclick=()=>{try{let prompt=$('query').value.trim();if(!prompt)throw Error('Write a prompt first.');action('/api/generate',{name:runName(),text:JSON.stringify({prompt,role:'query'}),suffix:'.jsonl',seeds:$('seeds').value,query:true})}catch(e){error(e)}};
+$('images').onchange=async e=>{try{let files=[...e.target.files];if(!files.length)return;if(files.reduce((s,f)=>s+f.size,0)>22e6)throw Error('Upload below 22 MB per batch, or use the CLI.');let payload=[];for(let f of files){let data=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(f)});payload.push({name:f.name,data})}await action('/api/import',{name:runName(),files:payload})}catch(e){error(e)}finally{e.target.value=''}};
+$('stop').onclick=()=>action('/api/stop',{});
+$('help').onclick=()=>$('about').showModal();$('close-help').onclick=()=>$('about').close();
+$('mesh').onchange=draw;$('reset').onclick=()=>{yaw=.45;pitch=-.2;zoom=1;draw()};
+$('download').onclick=()=>{if(!map)return;let a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(map,null,2)],{type:'application/json'}));a.href=u;a.download=current+'-map.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+function imageUrl(p){return '/image/'+encodeURIComponent(current)+'/'+encodeURIComponent(p.id)+'.png'}
+function select(p){selected=p.id;$('selection-empty').hidden=true;$('selection').hidden=false;$('preview').src=imageUrl(p);$('role').textContent=p.role+' · '+(p.origin||'generated');$('selected-title').textContent=p.role==='query'?'Added image':'Reference collection';$('selected-prompt').textContent=p.prompt;$('novelty').textContent=p.novelty.toFixed(5);$('percentile').textContent=p.calibration_percentile.toFixed(0)+'%';$('coverage').textContent=p.outside?'Above the sampled coverage threshold.':'Within the sampled coverage threshold.';$('metadata').textContent=`${map.model}${p.seed!==null?' · Seed '+p.seed:''} · ${p.dimension.toLocaleString()} values. Reference scores exclude the image itself.`;$('neighbors').replaceChildren();p.neighbors.forEach(n=>{let other=map.points.find(x=>x.id===n.id);if(!other)return;let b=document.createElement('button'),im=document.createElement('img'),label=document.createElement('span');im.src=imageUrl(other);im.alt=other.prompt;label.textContent=n.distance.toFixed(4);b.title=other.prompt;b.append(im,label);b.onclick=()=>select(other);$('neighbors').append(b)});draw()}
+function transform(v,center,scale,w,h){let x=(v[0]-center[0])*scale,y=(v[1]-center[1])*scale,z=(v[2]-center[2])*scale;let a=x*Math.cos(yaw)+z*Math.sin(yaw),b=-x*Math.sin(yaw)+z*Math.cos(yaw),c=y*Math.cos(pitch)-b*Math.sin(pitch),d=y*Math.sin(pitch)+b*Math.cos(pitch);return {x:w/2+a*zoom,y:h/2-c*zoom,z:d}}
+function draw(){let box=canvas.getBoundingClientRect(),w=box.width,h=box.height,dpr=Math.min(devicePixelRatio||1,2);if(lastSize!==`${w},${h},${dpr}`){canvas.width=w*dpr;canvas.height=h*dpr;lastSize=`${w},${h},${dpr}`}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);screen=[];if(!map)return;
+ const positions=map.points.filter(p=>p.role==='reference').map(p=>p.position),lo=[0,1,2].map(i=>Math.min(...positions.map(p=>p[i]))),hi=[0,1,2].map(i=>Math.max(...positions.map(p=>p[i]))),center=lo.map((x,i)=>(x+hi[i])/2),scale=Math.min(w,h)*.68/Math.max(...hi.map((x,i)=>x-lo[i]),.01);
+ const view=v=>transform(v,center,scale,w,h);
+ if($('mesh').checked&&map.mesh.faces.length){const vertices=map.mesh.vertices.map(view),faces=map.mesh.faces.map(f=>({p:f.map(i=>vertices[i]),z:f.reduce((s,i)=>s+vertices[i].z,0)/3})).sort((a,b)=>a.z-b.z);ctx.lineWidth=.6;for(let f of faces){ctx.beginPath();f.p.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='rgba(71,155,217,.025)';ctx.strokeStyle='rgba(105,186,244,.20)';ctx.fill();ctx.stroke()}}
+ screen=map.points.map(p=>({...view(p.position),point:p})).sort((a,b)=>a.z-b.z);for(let p of screen){ctx.beginPath();ctx.arc(p.x,p.y,p.point.id===selected?6:p.point.role==='query'?4.5:3.2,0,Math.PI*2);ctx.fillStyle=colors[p.point.role]||'#fff';ctx.fill();if(p.point.id===selected){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke()}}
+}
+function hit(x,y){return [...screen].reverse().find(p=>Math.hypot(p.x-x,p.y-y)<10)}
+canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY};moved=false;canvas.setPointerCapture(e.pointerId)};
+canvas.onpointermove=e=>{if(drag){let dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>2)moved=true;yaw+=dx*.008;pitch=Math.max(-1.5,Math.min(1.5,pitch+dy*.008));drag={x:e.clientX,y:e.clientY};draw();$('hover').hidden=true}else{let b=canvas.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top,p=hit(x,y);$('hover').hidden=!p;if(p){$('hover').textContent=p.point.prompt;$('hover').style.left=Math.min(x+12,b.width-230)+'px';$('hover').style.top=(y+12)+'px'}canvas.style.cursor=p?'pointer':'grab'}};
+canvas.onpointerup=e=>{if(!moved){let b=canvas.getBoundingClientRect(),p=hit(e.clientX-b.left,e.clientY-b.top);if(p)select(p.point)}drag=null};canvas.onpointercancel=()=>{drag=null};
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.2,Math.min(8,zoom*Math.exp(-e.deltaY*.001)));draw()},{passive:false});
+new ResizeObserver(draw).observe($('stage'));poll();setInterval(poll,1500);

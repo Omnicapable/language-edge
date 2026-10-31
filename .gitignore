@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+runs/
+models/
+private/
+project_admin/render/
+project_admin/screenshots/
+project_admin/demo-install-check/
+project_admin/clean-env/
+*.log
+.env
+dist/
+build/

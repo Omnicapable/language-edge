@@ -1,0 +1,77 @@
+{
+  "run": "demo-sd15",
+  "model": "sd15",
+  "device": "cuda",
+  "image_count": 12,
+  "representation": {
+    "encoder": "vae-posterior-mean",
+    "size": 512,
+    "preprocess": "exif-transpose RGB center-square Lanczos [-1,1]",
+    "vector": "scaled latent CHW flattened then L2 normalized",
+    "metric": "cosine"
+  },
+  "vae_sha256": "9e82d56dda5e7f16a22254875c2664c059cebd68498adf7bd42a4d3604c69ccf",
+  "repeatability_and_perturbations": [
+    {
+      "id": "1644b62b8a77b8e6f390ac6d",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.3266175389289856,
+      "brightness_10pct_cosine_distance": 0.01936507225036621
+    },
+    {
+      "id": "241f90d658ae634b0a4fa0ff",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.34871089458465576,
+      "brightness_10pct_cosine_distance": 0.0109405517578125
+    },
+    {
+      "id": "2460b1314dd792e62ab26cbc",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.5133978128433228,
+      "brightness_10pct_cosine_distance": 0.0078582763671875
+    },
+    {
+      "id": "2be73c501210b7a8e415afe6",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.5758978724479675,
+      "brightness_10pct_cosine_distance": 0.006160378456115723
+    },
+    {
+      "id": "2d70261bb8eec86fec05c5a8",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.4919036626815796,
+      "brightness_10pct_cosine_distance": 0.009418785572052002
+    },
+    {
+      "id": "380b81ca9a93825e3fc25dab",
+      "repeat_max_absolute_error": 0.0,
+      "shift_8px_cosine_distance": 0.2560610771179199,
+      "brightness_10pct_cosine_distance": 0.011497855186462402
+    }
+  ],
+  "median_between_reference_distance": 0.5719140768051147,
+  "mean_full_space_to_3d_neighbor_recall": 0.8666666666666667,
+  "retained_reference_variance": 0.6499320417642593,
+  "reference_size_sweep": [
+    {
+      "reference_count": 4,
+      "evaluation_mean_novelty": 0.46507444977760315
+    },
+    {
+      "reference_count": 5,
+      "evaluation_mean_novelty": 0.4815889298915863
+    },
+    {
+      "reference_count": 8,
+      "evaluation_mean_novelty": 0.43077802658081055
+    }
+  ],
+  "encoding_checks_seconds": 4.692849599989131,
+  "conclusion": "Engineering pilot only. VAE cosine distance is spatially sensitive and not a validated semantic or language-reach metric.",
+  "not_verified": [
+    "Mac hardware",
+    "10000 prompt performance",
+    "large held-out calibration",
+    "semantic validity"
+  ]
+}

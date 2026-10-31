@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "language-edge-explorer"
+version = "0.1.0"
+description = "Explore sampled prompt coverage in model-specific image VAE representations"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = ["numpy>=1.26,<3", "Pillow>=10,<13", "scipy>=1.11,<2", "scikit-learn>=1.4,<2"]
+
+[project.optional-dependencies]
+generate = ["torch>=2.5,<3", "diffusers>=0.29,<0.40", "transformers>=4.41,<5", "accelerate>=0.30,<2", "safetensors>=0.4,<1", "huggingface-hub>=0.23,<1"]
+test = ["pytest>=8,<10"]
+
+[project.scripts]
+language-edge = "language_edge.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["language_edge*"]
+
+[tool.setuptools.package-data]
+language_edge = ["web/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

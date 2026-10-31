@@ -1,0 +1,20 @@
+{
+  "run": "demo-sdxl",
+  "query_seed": 43,
+  "reference_sha256": "bf1d1b3a27afd994eb5e6934f1b5dd7c53dd6fe4ede51dee29ccf67e1f6361d7",
+  "frozen_reference_unchanged": true,
+  "resume_without_duplicate_records": true,
+  "staged_records_after_stop": 37,
+  "new_generation_and_import_seconds": 66.58793759997934,
+  "total_images": 41,
+  "matched_seed_pairs": [
+    {
+      "prompt": "A red ceramic bowl on a plain white table",
+      "seed42_to_seed43_cosine_distance": 0.7259687185287476
+    },
+    {
+      "prompt": "A white horse standing in a green meadow",
+      "seed42_to_seed43_cosine_distance": 0.6416746377944946
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Versions used for the Windows NVIDIA pilot. Install torch for your hardware first.
+torch==2.5.1
+diffusers==0.29.2
+transformers==4.44.2
+accelerate==0.33.0
+huggingface-hub==0.24.6
+numpy==1.26.4
+scipy==1.17.1
+scikit-learn==1.9.1
+Pillow==12.3.0
+pytest==9.2.0
