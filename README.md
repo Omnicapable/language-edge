@@ -1,5 +1,7 @@
 # Language Edge
 
+Created by **Gordon Berger and Omnicapable**. Code licensed under MIT; model terms are separate.
+
 An experimental explorer of **sampled prompt coverage in model-specific image VAE representations**. Supply prompts, build a fixed 3D reference map, then import or generate additional images and inspect their positions, neighbours, and novelty.
 
 This project grew out of Terra Obscura. The original demonstration mapped SAE features from generation activations. This implementation instead encodes finished images with the selected model's VAE. Neither an SAE nor access to an image's original generation history is required.
