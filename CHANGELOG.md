@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 security and privacy review — 1 November 2026
+
+- Retired vulnerable legacy dependency pins, required current release dependencies, and updated installer tooling. Full fresh-environment advisory scan is recorded in reports.
+- Hardened local request origin/Host checks, privacy headers, JSON validation, read timeouts and path containment.
+- Validate actual image contents and remove EXIF, GPS, comments and ICC from stored/served copies.
+- New UI workspaces default to local application data rather than the repository. Existing workspaces remain untouched and can be reopened explicitly.
+- Disable Hugging Face telemetry by default; explain downloads, cloud sync, derived data and sharing risks in PRIVACY.md.
+- Freeze and checksum the public demo. Release packaging uses an explicit allowlist, rejects common secret patterns, and never reads live user runs.
+- Keep local planning documents/admin helpers out of the current public tree; prior history was scanned rather than rewritten.
+- Added targeted security regressions, a security policy, least-privilege CI permissions and Dependabot configuration.
+- GPU pilot results remain historical; upgraded-stack verification and outstanding platform limits are recorded separately.
+
 ## Monochrome interface update — 31 October 2026
 
 - Changed the interface and coverage mesh to black, white and neutral gray.

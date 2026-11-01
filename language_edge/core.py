@@ -6,12 +6,34 @@ import io
 import json
 import os
 import re
+import sys
 from pathlib import Path
 import numpy as np
+from PIL import Image, ImageOps
 from scipy.spatial import ConvexHull, QhullError
 from sklearn.decomposition import PCA
 
 SCHEMA = 1
+MAX_IMAGE_PIXELS = 40_000_000
+
+def default_data_dir():
+    """Keep new user data outside a downloaded repository and typical cloud folders."""
+    if os.environ.get("LANGUAGE_EDGE_DATA"):
+        return Path(os.environ["LANGUAGE_EDGE_DATA"]).expanduser().resolve()
+    if sys.platform=="win32":
+        return Path(os.environ.get("LOCALAPPDATA",Path.home()/"AppData/Local"))/"LanguageEdge"/"runs"
+    if sys.platform=="darwin":
+        return Path.home()/"Library/Application Support/LanguageEdge/runs"
+    return Path(os.environ.get("XDG_DATA_HOME",Path.home()/".local/share"))/"language-edge/runs"
+
+def clean_image(image):
+    """Validate decoded dimensions and strip EXIF, comments and ICC from served copies."""
+    if image.width*image.height > MAX_IMAGE_PIXELS:
+        raise ValueError("Image is too large; resize below 40 megapixels.")
+    if image.format is not None and image.format not in ("PNG", "JPEG", "WEBP"):
+        raise ValueError("Choose a real PNG, JPEG or WebP image.")
+    rgb = ImageOps.exif_transpose(image).convert("RGB")
+    return Image.frombytes("RGB", rgb.size, rgb.tobytes())
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
@@ -142,7 +164,7 @@ class Run:
             return False
         vector = np.asarray(vector, dtype=np.float32).ravel()
         unit_vectors(vector[None])
-        image.save(self.path / "images" / f"{key}.png")
+        clean_image(image).save(self.path / "images" / f"{key}.png")
         temp = self.path / "vectors" / f"{key}.tmp"
         with temp.open("wb") as f:
             np.save(f, vector, allow_pickle=False)

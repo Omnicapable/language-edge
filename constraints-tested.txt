@@ -1,11 +1,13 @@
-# Versions used for the Windows NVIDIA pilot. Install torch for your hardware first.
-torch==2.5.1
-diffusers==0.29.2
-transformers==4.44.2
-accelerate==0.33.0
-huggingface-hub==0.24.6
+# Security-reviewed release versions. The earlier GPU pilot used a legacy stack.
+# Install a compatible current PyTorch build for your hardware first.
+torch==2.15.0
+diffusers==0.42.1
+transformers==5.22.1
+accelerate==1.15.0
+huggingface-hub==2.4.0
+safetensors==0.8.0
 numpy==1.26.4
 scipy==1.17.1
 scikit-learn==1.9.1
-Pillow==12.3.0
+Pillow==13.0.0
 pytest==9.2.0

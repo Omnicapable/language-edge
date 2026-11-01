@@ -9,6 +9,8 @@ if errorlevel 1 (
 if not exist ".venv\Scripts\python.exe" py -3.11 -m venv .venv
 if errorlevel 1 exit /b 1
 echo Installing packages. GPU users: see README for the PyTorch CUDA install command.
+".venv\Scripts\python.exe" -m pip install --upgrade pip setuptools wheel
+if errorlevel 1 exit /b 1
 ".venv\Scripts\python.exe" -m pip install -c constraints-tested.txt -e ".[generate]"
 if errorlevel 1 (
   pause

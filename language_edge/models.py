@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps
-from .core import Run, atomic_json, digest, read_json
+from .core import Run, atomic_json, digest, read_json, clean_image
 
 PRESETS = {
     "sdxl-turbo": {"source":"stabilityai/sdxl-turbo", "steps":4, "guidance":0.0},
@@ -125,7 +125,9 @@ def generate(run, prompts, seeds=(42,), query=False, progress=print, cancel=lamb
             pipe.enable_model_cpu_offload()
         else:
             pipe.to(dev)
-            pipe.enable_attention_slicing()
+            # CPU uses PyTorch's native attention backend; manual slicing is much slower.
+            if dev=="mps":
+                pipe.enable_attention_slicing()
         for index,meta in enumerate(need_generation):
             if cancel():
                 break
@@ -174,8 +176,7 @@ def import_images(run, paths, progress=print, cancel=lambda:False):
         progress(f"Encoding imported image {index+1}/{len(paths)}")
         content_hash=hashlib.sha256(path.read_bytes()).hexdigest()
         with Image.open(path) as image:
-            if image.width*image.height>40_000_000:
-                raise ValueError("Image is too large; resize below 40 megapixels.")
+            image=clean_image(image)
             vector=encode_image(image,vae,dev,run.config["representation"]["size"])
             run.add(image.convert("RGB"),vector,{"id":"import-"+content_hash[:24],"group":content_hash,
                 "role":"query","origin":"imported","prompt":path.name,"seed":None})

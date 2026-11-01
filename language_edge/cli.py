@@ -1,7 +1,7 @@
 import argparse
 import json
 from pathlib import Path
-from .core import Run, parse_prompts, slug
+from .core import Run, parse_prompts, slug, default_data_dir
 
 def main():
     parser=argparse.ArgumentParser(description="Language Edge experimental VAE coverage explorer")
@@ -14,7 +14,7 @@ def main():
     for name in ("build","export"):
         sub.add_parser(name).add_argument("run")
     imp=sub.add_parser("import-images"); imp.add_argument("run"); imp.add_argument("images",nargs="+")
-    serve=sub.add_parser("serve"); serve.add_argument("--data",default="runs"); serve.add_argument("--port",type=int,default=8877)
+    serve=sub.add_parser("serve"); serve.add_argument("--data",default=str(default_data_dir())); serve.add_argument("--port",type=int,default=8877)
     serve.add_argument("--no-browser",action="store_true")
     args=parser.parse_args()
     try:

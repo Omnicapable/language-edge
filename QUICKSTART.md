@@ -23,4 +23,4 @@ Mac: see README.md for the Terminal commands to enable and run `Setup Mac.comman
 
 The wireframe illustrates your reference collection in 3D. A high novelty score means an image differs more from nearby reference fingerprints in the original space. The 3D view can hide some differences, and VAE fingerprints are sensitive to composition and shifts. This is an experimental explorer of sampled coverage, not proof of a universal language boundary.
 
-Each model has its own map. Your prompts and images remain on your computer. Model downloads require internet; processing and the browser interface run locally. A GPU is recommended for generation.
+Each model has its own map. Processing and the browser interface run locally; installation and model downloads require internet. New workspaces default to local application data outside the repository. Cloud backup/sync software can still copy any chosen folder independently; see PRIVACY.md. A GPU is recommended for generation, with a current compatible PyTorch build and driver. Mac hardware and upgraded-stack GPU verification are pending.

@@ -15,18 +15,19 @@ This project grew out of Terra Obscura. The original demonstration mapped SAE fe
 
 ## Installation
 
-Use Python **3.11**, a recent browser, and enough disk space for model weights and outputs. The code supports Python 3.10–3.12. A GPU is recommended for generation; CPU generation can be very slow. Model downloads can require several GB. All processing and serving are local; downloading model files is the only required network activity.
+Use Python **3.11**, a recent browser, and enough disk space for model weights and outputs. The code supports Python 3.11–3.12. A GPU is recommended for generation; CPU generation can be very slow. Model downloads can require several GB. Processing and serving are local. Installation and model downloads contact package/model hosts; prompts and images are not sent to an inference service. See PRIVACY.md for storage, metadata and cloud-sync limitations.
 
 ### Windows
 
 Run `Setup Windows.cmd`, then `Start Windows.cmd`. The UI opens at <http://127.0.0.1:8877>.
 
-For an NVIDIA GPU, install a CUDA-enabled PyTorch build in the virtual environment before installing the remaining generation extras. For example, the locally tested CUDA 12.4 build is:
+Setup installs the security-reviewed release dependencies. For an NVIDIA GPU, select a current CUDA-enabled PyTorch build compatible with the required release version and your driver using the official installer. Do not use the old PyTorch 2.5.1/CUDA 12.4 pilot instructions: those pins were retired after the security review.
+
+A manual installation is:
 
 ```powershell
 py -3.11 -m venv .venv
-.venv\Scripts\python.exe -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
-.venv\Scripts\python.exe -m pip install -e ".[generate,test]"
+.venv\Scripts\python.exe -m pip install -c constraints-tested.txt -e ".[generate,test]"
 .venv\Scripts\python.exe -m language_edge.cli serve
 ```
 
@@ -48,12 +49,12 @@ Apple Silicon uses MPS when available, with float32 generation and encoding. Thi
 
 ```bash
 python -m pip install -e .
-language-edge serve --data runs
+language-edge serve
 ```
 
 The UI uses local files only: no CDN, telemetry, or remote frontend dependencies. Leave the server terminal open. It binds only to loopback and is not designed as a shared internet service.
 
-The source release includes `examples/demo-sdxl.zip`. Setup installs it automatically into `runs` if that workspace does not already exist. For a viewer-only installation, run `python scripts/install_demo.py`, then launch the server. The demo has a small calibration set and is for learning the interface.
+The source release includes a checksum-verified `examples/demo-sdxl.zip`. Setup installs it automatically into the default data directory if that workspace does not already exist. For a viewer-only installation, run `python scripts/install_demo.py`, then launch the server. The demo is frozen public content and is never rebuilt from live user workspaces. Its small calibration set is for learning the interface.
 
 ## Two phase workflow
 
@@ -103,6 +104,8 @@ Use `--model sd15` for SD 1.5. Default generation: 512×512; Turbo uses 4 steps/
 ## Data and scaling
 
 Run folders contain config, a generation plan, staged generations, PNG images, per-image `.npy` vectors, atomic JSON completion records, frozen `reference.npz`, and `map.json`. Treat the complete run folder as the portable unit. Do not share private prompts or images unintentionally.
+
+New UI workspaces default to `%LOCALAPPDATA%\LanguageEdge\runs` on Windows, `~/Library/Application Support/LanguageEdge/runs` on Mac, or the XDG data directory on Linux. Use `LANGUAGE_EDGE_DATA` or `serve --data PATH` to override. Existing project `runs/` folders are not moved or deleted; use `serve --data runs` to reopen them. If any chosen folder is inside OneDrive, iCloud or another synced location, that service may upload data independently of this app.
 
 At 512 px, 10,000 float32 VAE fingerprints alone occupy roughly 625 MiB. Images, staging, cached weights and PCA workspaces need additional space. Exact neighbour search is quadratic in reference count and expensive at 10,000 states; it is batched to bound the temporary distance matrix, but this is not a completed 10,000-prompt performance benchmark. Start with 36–100 prompts, measure runtime/storage, then expand. OneDrive synchronization can amplify storage and IO costs.
 

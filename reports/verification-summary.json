@@ -70,5 +70,25 @@
     "packaged_viewer": true,
     "core_tests_passed": 7,
     "dependency_check": "passed"
+  },
+  "latest_review": {
+    "date": "2026-11-01",
+    "release": "0.1.1",
+    "core_security_tests_passed": 23,
+    "direct_dependencies_audited": 11,
+    "runtime_distributions_audited": 56,
+    "known_advisories": 0,
+    "updated_stack_models_cpu": [
+      "sd15",
+      "sdxl-turbo"
+    ],
+    "browser_checks": "passed including upload/query",
+    "historical_gpu_results": "Legacy dependency stack; not upgraded-stack validation",
+    "pending": [
+      "Mac hardware",
+      "upgraded-stack GPU",
+      "10000 prompt benchmark",
+      "GitHub publication"
+    ]
   }
 }

@@ -1,0 +1,6 @@
+{
+  "scope": "tracked working tree",
+  "files_checked": 51,
+  "findings": [],
+  "note": "Pattern scan, not proof of absence of secrets. Personal author names, filenames and intentional demo prompts require human review."
+}

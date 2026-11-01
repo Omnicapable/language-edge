@@ -12,5 +12,18 @@ project_admin/demo-install-check/
 project_admin/clean-env/
 *.log
 .env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+.netrc
+.aws/
+.ssh/
 dist/
 build/
+project_admin/
+Language Edge Plan and Changelog.docx
+reports/*-before.json

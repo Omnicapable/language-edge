@@ -6,6 +6,7 @@ const req=resolveFrom?createRequire(path.join(resolveFrom,'package.json')):requi
 const {chromium}=req('playwright');
 (async()=>{
  const browser=await chromium.launch({headless:true,...(process.env.LE_BROWSER_CHANNEL?{channel:process.env.LE_BROWSER_CHANNEL}:{})});
+ try{
  const errors=[];
  const page=await browser.newPage({viewport:{width:1500,height:1050}});
  page.on('pageerror',e=>errors.push(e.message));
@@ -34,7 +35,7 @@ const {chromium}=req('playwright');
  await page.screenshot({path:path.join(out,'mobile.png'),fullPage:true});
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
  if(overflow)throw Error('Mobile horizontal overflow');
- await browser.close();
  if(errors.length)throw Error(errors.join('\n'));
  console.log('UI passed: desktop, mobile, help, console'+(process.env.LE_EXPECT_MAP==='1'?', map selection, envelope, camera':''));
+ }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
