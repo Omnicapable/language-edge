@@ -2,3 +2,6 @@
 
 /* Shape, as well as tone, distinguishes groups without color. */
 .legend i{width:7px;height:7px;flex-shrink:0}.legend .reference{background:#f5f5f5}.legend .calibration{border-radius:0;background:#aaa}.legend .evaluation{border-radius:0;background:#888;clip-path:polygon(50% 0,100% 100%,0 100%)}.legend .query{border-radius:0;background:transparent;border:1px solid #fff;transform:rotate(45deg)}#error:not(:empty){border-left:2px solid #fff;padding-left:10px}
+/* Terra Obscura Dune sky is painted on the canvas; the interface stays monochrome. */
+#stage{background:linear-gradient(#7b6f60,#000)}
+#empty p,#empty h2{text-shadow:0 1px 8px #0009}

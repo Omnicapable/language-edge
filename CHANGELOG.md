@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 Terra Obscura starfield — 1 November 2026
+
+- Matched the map background to Terra Obscura's default Dune sky: warm gold stars and a continuous brown-to-black falloff.
+- Retained monochrome controls, map markers and mesh. The seeded sky is cached and only rebuilt on resize, including in the empty state.
+
 ## 0.1.2 Mac compatibility pass — 1 November 2026
 
 - Added standard-library Mac preflight for native Python, Rosetta, macOS and memory, with auto/full/viewer installation modes.

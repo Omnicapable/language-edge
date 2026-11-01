@@ -8,6 +8,8 @@ Terra Obscura's caption capture, pilot scorer, final mapper and viewer were revi
 
 The new tool does not copy the SAE pipeline or viewer source. Its standalone backend encodes finished images, and its browser canvas viewer has no third-party frontend dependencies. This avoids importing old local paths and assumptions into the public package.
 
+Visual update in 0.1.3: the Dune sky colors and deterministic starfield were subsequently adapted from the user's Terra Obscura viewer. This is a background rendering change only; no SAE capture or scoring code was imported.
+
 ## Available environment
 
 - Windows, NVIDIA RTX 4060 laptop GPU with 8 GB VRAM.

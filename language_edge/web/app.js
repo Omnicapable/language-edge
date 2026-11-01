@@ -3,6 +3,22 @@ const $=id=>document.getElementById(id), canvas=$('canvas'),ctx=canvas.getContex
 let state={runs:[],job:{}},token='',map=null,current='',selected=null,promptText='',promptSuffix='.csv',signature='';
 let yaw=.45,pitch=-.2,zoom=1,drag=null,moved=false,screen=[],lastSize='';
 const colors={reference:'#f5f5f5',calibration:'#aaaaaa',evaluation:'#888888',query:'#ffffff'};
+// Match Terra Obscura's default Dune scene, cached so orbiting only redraws the map.
+const sky=document.createElement('canvas');let skyStamp='';
+function drawSky(w,h,dpr){
+ const stamp=`${w},${h},${dpr}`;
+ if(skyStamp!==stamp){
+  sky.width=canvas.width;sky.height=canvas.height;const s=sky.getContext('2d');s.setTransform(dpr,0,0,dpr,0,0);
+  const gradient=s.createLinearGradient(0,0,0,h);
+  for(let i=0;i<=32;i++){const t=i/32,shade=112*Math.pow(1-t,2.1);gradient.addColorStop(t,`rgb(${(shade*1.10).toFixed(3)},${(shade*.99).toFixed(3)},${(shade*.86).toFixed(3)})`)}
+  s.fillStyle=gradient;s.fillRect(0,0,w,h);
+  let seed=1937;const random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
+  const count=Math.max(90,Math.floor(w*h/6500));
+  for(let i=0;i<count;i++){const x=random()*w,y=random()*h*.82,r=random()*1.3+.18,a=random()*.65+.12;s.globalAlpha=a;s.fillStyle='#ead2aa';s.beginPath();s.arc(x,y,r,0,Math.PI*2);s.fill()}
+  s.globalAlpha=1;skyStamp=stamp;
+ }
+ ctx.drawImage(sky,0,0,w,h);
+}
 function error(e){$('error').textContent=e.message||String(e)}
 async function api(path,body){let r=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json','X-LE-Token':token},body:JSON.stringify(body)}:{});let v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v}
 async function action(path,body){$('error').textContent='';try{await api(path,body);await poll()}catch(e){error(e)}}
@@ -35,7 +51,7 @@ $('download').onclick=()=>{if(!map)return;let a=document.createElement('a'),u=UR
 function imageUrl(p){return '/image/'+encodeURIComponent(current)+'/'+encodeURIComponent(p.id)+'.png'}
 function select(p){selected=p.id;$('selection-empty').hidden=true;$('selection').hidden=false;$('preview').src=imageUrl(p);$('role').textContent=p.role+' · '+(p.origin||'generated');$('selected-title').textContent=p.role==='query'?'Added image':'Reference collection';$('selected-prompt').textContent=p.prompt;$('novelty').textContent=p.novelty.toFixed(5);$('percentile').textContent=p.calibration_percentile.toFixed(0)+'%';$('coverage').textContent=p.outside?'Above the sampled coverage threshold.':'Within the sampled coverage threshold.';$('metadata').textContent=`${map.model}${p.seed!==null?' · Seed '+p.seed:''} · ${p.dimension.toLocaleString()} values. Reference scores exclude the image itself.`;$('neighbors').replaceChildren();p.neighbors.forEach(n=>{let other=map.points.find(x=>x.id===n.id);if(!other)return;let b=document.createElement('button'),im=document.createElement('img'),label=document.createElement('span');im.src=imageUrl(other);im.alt=other.prompt;label.textContent=n.distance.toFixed(4);b.title=other.prompt;b.append(im,label);b.onclick=()=>select(other);$('neighbors').append(b)});draw()}
 function transform(v,center,scale,w,h){let x=(v[0]-center[0])*scale,y=(v[1]-center[1])*scale,z=(v[2]-center[2])*scale;let a=x*Math.cos(yaw)+z*Math.sin(yaw),b=-x*Math.sin(yaw)+z*Math.cos(yaw),c=y*Math.cos(pitch)-b*Math.sin(pitch),d=y*Math.sin(pitch)+b*Math.cos(pitch);return {x:w/2+a*zoom,y:h/2-c*zoom,z:d}}
-function draw(){let box=canvas.getBoundingClientRect(),w=box.width,h=box.height,dpr=Math.min(devicePixelRatio||1,2);if(lastSize!==`${w},${h},${dpr}`){canvas.width=w*dpr;canvas.height=h*dpr;lastSize=`${w},${h},${dpr}`}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);screen=[];if(!map)return;
+function draw(){let box=canvas.getBoundingClientRect(),w=box.width,h=box.height,dpr=Math.min(devicePixelRatio||1,2);if(w<=0||h<=0)return;if(lastSize!==`${w},${h},${dpr}`){canvas.width=w*dpr;canvas.height=h*dpr;lastSize=`${w},${h},${dpr}`}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);drawSky(w,h,dpr);screen=[];if(!map)return;
  const positions=map.points.filter(p=>p.role==='reference').map(p=>p.position),lo=[0,1,2].map(i=>Math.min(...positions.map(p=>p[i]))),hi=[0,1,2].map(i=>Math.max(...positions.map(p=>p[i]))),center=lo.map((x,i)=>(x+hi[i])/2),scale=Math.min(w,h)*.68/Math.max(...hi.map((x,i)=>x-lo[i]),.01);
  const view=v=>transform(v,center,scale,w,h);
  if($('mesh').checked&&map.mesh.faces.length){const vertices=map.mesh.vertices.map(view),faces=map.mesh.faces.map(f=>({p:f.map(i=>vertices[i]),z:f.reduce((s,i)=>s+vertices[i].z,0)/3})).sort((a,b)=>a.z-b.z);ctx.lineWidth=.6;for(let f of faces){ctx.beginPath();f.p.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='rgba(255,255,255,.025)';ctx.strokeStyle='rgba(220,220,220,.24)';ctx.fill();ctx.stroke()}}

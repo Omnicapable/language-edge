@@ -16,4 +16,4 @@ Installed distributions contain their own license notices, including transitive/
 
 SDXL-Turbo's model page reports `sai-nc-community` and directs commercial users to Stability AI's current licensing terms. SD 1.5's model page reports CreativeML Open RAIL-M. These are distinct from the toolkit's code license. Users obtain weights separately and must follow their applicable terms. Model cards checked 30–31 October 2026; recheck before commercial release. No legal clearance is implied.
 
-Terra Obscura provided the workflow background. The original Surkov sdxl-unbox repository has an MIT license, but no source or SAE checkpoint from it is copied into this implementation.
+Terra Obscura provided the workflow background. The Dune sky palette and deterministic starfield were adapted from the user's Terra Obscura viewer for the 0.1.3 visual update. The original Surkov sdxl-unbox repository has an MIT license, but no source or SAE checkpoint from it is copied into this implementation.
