@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 Mac compatibility pass — 1 November 2026
+
+- Added standard-library Mac preflight for native Python, Rosetta, macOS and memory, with auto/full/viewer installation modes.
+- Corrected the Intel Mac claim: the pinned PyTorch wheel targets Apple Silicon/macOS 14+, so Intel gets viewer-only rather than a vulnerable dependency downgrade.
+- Added a local doctor command and small MPS runtime probe.
+- Added explicit device selection and an experimental lower-memory MPS generation option; VAE encoding remains float32.
+- Drop models and clean CUDA/MPS caches between stages and on error/cancellation paths. MPS failures preserve completed files and provide actionable recovery guidance.
+- Show viewer-only status and disable unavailable generation/import controls when model packages are absent.
+- Added simulated Mac regression tests and setup guidance. Actual Mac/MPS hardware execution remains unverified.
+
 ## 0.1.1 security and privacy review — 1 November 2026
 
 - Retired vulnerable legacy dependency pins, required current release dependencies, and updated installer tooling. Full fresh-environment advisory scan is recorded in reports.

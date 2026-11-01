@@ -90,5 +90,17 @@
       "10000 prompt benchmark",
       "GitHub publication"
     ]
+  },
+  "mac_compatibility_pass": {
+    "date": "2026-11-01",
+    "release": "0.1.2",
+    "tests_passed": 33,
+    "simulated_mac_profiles": true,
+    "actual_mac_hardware_tested": false,
+    "cpu_refactor_smoke": "passed",
+    "browser_controls_and_workflow": "passed",
+    "mac_shell_syntax": "checked with Git Bash",
+    "full_generation_target": "Apple Silicon arm64 Python and macOS 14+",
+    "intel_route": "viewer only"
   }
 }

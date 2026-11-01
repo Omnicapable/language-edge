@@ -13,7 +13,7 @@ SOURCE_DIRS={'language_edge','docs','scripts','tests','.github'}
 TEXT_SUFFIXES={'.py','.md','.json','.csv','.cjs','.html','.css','.yml','.toml','.txt'}
 PUBLIC_REPORTS={'AUDIT.md','REPRESENTATION_REVIEW.md','SECURITY_REVIEW.md','sd15-integration.json',
     'sd15-pilot.json','sdxl-integration.json','sdxl-pilot.json','verification-summary.json',
-    'dependency-audit-direct.json','dependency-audit-runtime.json','release-privacy-scan.json','current-stack-smoke.json'}
+    'dependency-audit-direct.json','dependency-audit-runtime.json','release-privacy-scan.json','current-stack-smoke.json','MAC_COMPATIBILITY.md','mac-compatibility-checks.json'}
 EXAMPLES={'demo-sdxl.zip','demo-manifest.json','sd15-smoke.csv'}
 
 def sensitive_path(path):

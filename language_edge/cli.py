@@ -9,6 +9,8 @@ def main():
     init=sub.add_parser("create")
     init.add_argument("run"); init.add_argument("--model",choices=["sdxl-turbo","sd15"],required=True)
     init.add_argument("--source"); init.add_argument("--device",default="auto"); init.add_argument("--size",type=int,default=512)
+    init.add_argument('--memory-mode',choices=['standard','low-memory'],default='standard')
+    sub.add_parser('doctor')
     gen=sub.add_parser("generate")
     gen.add_argument("run"); gen.add_argument("prompts"); gen.add_argument("--seeds",default="42"); gen.add_argument("--query",action="store_true")
     for name in ("build","export"):
@@ -18,12 +20,15 @@ def main():
     serve.add_argument("--no-browser",action="store_true")
     args=parser.parse_args()
     try:
-        if args.command=="serve":
+        if args.command=='doctor':
+            from .platform_support import runtime_status
+            print(json.dumps(runtime_status(),indent=2))
+        elif args.command=="serve":
             from .server import serve
             serve(args.data,args.port,not args.no_browser)
         elif args.command=="create":
             from .models import new_config
-            Run.create(args.run,new_config(args.model,args.source,args.device,args.size))
+            Run.create(args.run,new_config(args.model,args.source,args.device,args.size,args.memory_mode))
             print("Created",args.run)
         elif args.command=="generate":
             from .models import generate

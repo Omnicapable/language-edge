@@ -35,7 +35,7 @@ Check your driver and select a compatible build using the [official PyTorch inst
 
 ### macOS
 
-Install Python 3.11. In Terminal, from the project folder:
+Install native Python 3.11 or 3.12. In Terminal, from the project folder:
 
 ```bash
 chmod +x 'Setup Mac.command' 'Start Mac.command'
@@ -43,7 +43,13 @@ chmod +x 'Setup Mac.command' 'Start Mac.command'
 ./'Start Mac.command'
 ```
 
-Apple Silicon uses MPS when available, with float32 generation and encoding. This may require substantial unified memory. Intel Macs use CPU. **Mac runtime verification is pending**; launchers and MPS selection are implemented, not hardware-validated. If local generation is impractical, generate a run on a compatible GPU machine and transfer the entire run folder. Inspecting an existing map needs only the core dependencies.
+Setup checks the OS, Python architecture, Rosetta and unified memory before installing. With the pinned PyTorch release, full local generation requires **Apple Silicon, native arm64 Python, and macOS 14 or later**. Intel Macs and older macOS default to viewer-only installation; the current pinned PyTorch wheel does not support Intel Mac generation. Do not downgrade to the retired vulnerable stack to work around this.
+
+Force a mode with `./'Setup Mac.command' full` or `./'Setup Mac.command' viewer`. `LANGUAGE_EDGE_PYTHON` can select a particular Python executable. Copied Windows virtual environments are rejected with instructions to create a native one.
+
+Apple GPU generation uses float32 in Standard mode. New workspaces can select **Lower memory on Apple GPU**, which uses experimental float16 generation; finished-image encoding remains float32 in both modes. Attention slicing and between-stage MPS cache cleanup reduce memory pressure. There is no automatic change to a frozen reference or silent precision fallback. Settings are fixed per workspace.
+
+Run `language-edge doctor` for a local platform/runtime report. Setup probes a tiny MPS operation when available and explains a CPU fallback. **Mac hardware verification is still pending**: architecture/error/cleanup paths were tested with simulations on Windows, not on an actual Mac. Start with one SD 1.5 generation, one image import, then a small map. If local generation is unavailable, generate a complete workspace on a compatible machine and transfer it for viewing. Viewer-only mode cannot encode additional image files.
 
 ### Viewer only
 

@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-01",
+  "release": "0.1.2",
+  "hardware": "Windows CPU",
+  "mps_hardware_tested": false,
+  "cpu_generation_and_encoding": true,
+  "model": "sdxl-turbo",
+  "dimension": 16384,
+  "generation_precision": "float32",
+  "encoding_precision": "float32",
+  "seconds": 60.389036200009286,
+  "simulated_mac_scenarios": [
+    "native arm64",
+    "Intel viewer",
+    "Rosetta",
+    "old macOS",
+    "memory policy",
+    "MPS cache release",
+    "failure cleanup"
+  ],
+  "note": "Simulated MPS policy tests and a real CPU regression do not validate Mac GPU execution."
+}

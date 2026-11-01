@@ -12,7 +12,8 @@ async function poll(){try{state=await api('/api/state');token=state.token;let ol
   $('job-text').textContent=state.job.message;$('job').classList.toggle('running',state.job.status==='running');$('stop').hidden=state.job.status!=='running';
   let r=state.runs.find(r=>r.name===$('run').value),busy=state.job.status==='running';
   for(let id of ['generate','build','generate-query','create'])$(id).disabled=busy||(id!=='create'&&!r);
-  $('generate').disabled=busy||!r||r.built;$('build').disabled=busy||!r||r.built||r.count<6;$('generate-query').disabled=busy||!r?.built;$('images').disabled=busy||!r?.built;
+  const modelReady=state.models_installed!==false;$('runtime-note').hidden=modelReady;
+  $('generate').disabled=busy||!r||r.built||!modelReady;$('build').disabled=busy||!r||r.built||r.count<6;$('generate-query').disabled=busy||!r?.built||!modelReady;$('images').disabled=busy||!r?.built||!modelReady;
   if(state.job.status==='error')$('error').textContent=state.job.message;
   if(current!==$('run').value){current=$('run').value;map=null;selected=null;$('selection').hidden=true;$('selection-empty').hidden=false;await loadMap()}
   else if(r?.built&&!map){await loadMap()}
@@ -21,7 +22,7 @@ async function poll(){try{state=await api('/api/state');token=state.token;let ol
 async function loadMap(){const r=state.runs.find(r=>r.name===current);if(r?.built){map=await api('/api/map/'+encodeURIComponent(current));$('map-title').textContent=current;$('empty').hidden=true;$('download').disabled=false;$('variance').textContent=`3D retains ${(map.variance.reduce((a,b)=>a+b,0)*100).toFixed(1)}% of reference variance`;$('stats').textContent=`${map.reference_count} reference · ${map.calibration_count} calibration · ${map.points.length} total. ${map.calibration_count<100?'Small calibration set: scores are exploratory.':''}`;}else{map=null;$('map-title').textContent=current||'Your next territory';$('empty').hidden=false;$('download').disabled=true;$('stats').textContent=''}draw()}
 $('run').addEventListener('change',poll);
 $('open-create').onclick=()=>{$('create-panel').hidden=!$('create-panel').hidden};
-$('create').onclick=async()=>{let name=$('name').value.trim();await action('/api/create',{name,model:$('model').value,source:$('source').value.trim()});if(state.runs.some(r=>r.name===name)){$('run').value=name;$('create-panel').hidden=true;await poll()}};
+$('create').onclick=async()=>{let name=$('name').value.trim();await action('/api/create',{name,model:$('model').value,source:$('source').value.trim(),device:$('device').value,memory_mode:$('memory-mode').value});if(state.runs.some(r=>r.name===name)){$('run').value=name;$('create-panel').hidden=true;await poll()}};
 $('prompts').onchange=async e=>{let f=e.target.files[0];if(f){promptText=await f.text();promptSuffix=f.name.endsWith('.jsonl')?'.jsonl':'.csv';$('prompt-name').textContent=f.name}};
 $('generate').onclick=()=>{try{if(!promptText)throw Error('Choose a prompt file first.');action('/api/generate',{name:runName(),text:promptText,suffix:promptSuffix,seeds:$('seeds').value})}catch(e){error(e)}};
 $('build').onclick=()=>{try{action('/api/build',{name:runName()})}catch(e){error(e)}};

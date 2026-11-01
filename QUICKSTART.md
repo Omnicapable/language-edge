@@ -8,7 +8,7 @@ Extract the source package. Install Python 3.11 and follow the Windows or Mac se
 
 Windows: `Setup Windows.cmd`, then `Start Windows.cmd`.
 
-Mac: see README.md for the Terminal commands to enable and run `Setup Mac.command` and `Start Mac.command`. Mac GPU execution is not yet hardware-verified.
+Mac: see README.md for the Terminal commands to run `Setup Mac.command` and `Start Mac.command`. Full generation needs Apple Silicon, native Python and macOS 14 or later with this release. Intel Macs get viewer-only mode. Setup checks compatibility; Mac GPU execution is not yet hardware-verified.
 
 ## Make your own map
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 import base64
 import io
+import importlib.util
 import json
 import mimetypes
 import secrets
@@ -45,6 +46,7 @@ def handler_class(data, jobs):
     data=Path(data).resolve()
     static=Path(__file__).parent/"web"
     token=secrets.token_urlsafe(32)
+    models_installed=all(importlib.util.find_spec(m) for m in ('torch','diffusers','transformers','accelerate'))
     class Handler(BaseHTTPRequestHandler):
         server_version="LanguageEdge"
         sys_version=""
@@ -103,7 +105,7 @@ def handler_class(data, jobs):
                             run=Run(folder)
                             runs.append({"name":folder.name,"model":run.config["model"],
                                 "count":len(run.records()),"built":(folder/"reference.npz").exists()})
-                    return self.send(200,{"runs":runs,"job":jobs.state,"token":token})
+                    return self.send(200,{"runs":runs,"job":jobs.state,"token":token,'models_installed':models_installed})
                 if path.startswith("/api/map/"):
                     run=self.run_path(path.split("/")[-1])
                     return self.send(200,read_json(self.local_resource(run,"map.json")))
@@ -149,7 +151,7 @@ def handler_class(data, jobs):
                 name=slug(body["name"])
                 folder=self.run_path(name)
                 if path=="/api/create":
-                    Run.create(folder,new_config(body["model"],body.get("source") or None,body.get("device","auto")))
+                    Run.create(folder,new_config(body["model"],body.get("source") or None,body.get("device","auto"),memory_mode=body.get('memory_mode','standard')))
                 elif path=="/api/generate":
                     from .models import generate
                     prompts=parse_prompts(body["text"],body.get("suffix",".csv"))
