@@ -1,5 +1,7 @@
 # Language Edge
 
+**Experimental Preview · v0.1.3**
+
 Created by **Gordon Berger and Omnicapable**. Code licensed under MIT; model terms are separate.
 
 An experimental explorer of **sampled prompt coverage in model-specific image VAE representations**. Supply prompts, build a fixed 3D reference map, then import or generate additional images and inspect their positions, neighbours, and novelty.

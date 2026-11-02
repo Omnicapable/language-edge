@@ -1,5 +1,10 @@
 # Changelog
 
+## Experimental Preview · v0.1.3 — 3 November 2026
+
+- Prepared the public preview with MIT code licensing and credit to Gordon Berger and Omnicapable.
+- Approved the bundled public demo: 41 images and their prompts. Local QA screenshots and private workspaces are excluded.
+
 ## 0.1.3 Terra Obscura starfield — 1 November 2026
 
 - Matched the map background to Terra Obscura's default Dune sky: warm gold stars and a continuous brown-to-black falloff.
