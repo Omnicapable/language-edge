@@ -1,3 +1,5 @@
+![Language Edge: a 3D coverage map against a starry background](docs/images/language-edge-cover.png)
+
 # Language Edge
 
 **Experimental Preview · v0.1.3**
