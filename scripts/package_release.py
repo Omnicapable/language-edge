@@ -36,7 +36,7 @@ def release_files(root=ROOT):
         if len(relative.parts)==1:
             approved=file.name in ROOT_FILES
         elif relative.parts[0] in SOURCE_DIRS:
-            approved=file.suffix in TEXT_SUFFIXES
+            approved=file.suffix in TEXT_SUFFIXES or relative.as_posix()=='docs/images/language-edge-cover.png'
         elif relative.parts[0]=='reports':
             approved=len(relative.parts)==2 and file.name in PUBLIC_REPORTS
         elif relative.parts[0]=='examples':
