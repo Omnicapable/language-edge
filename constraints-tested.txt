@@ -3,7 +3,7 @@
 torch==2.15.0
 diffusers==0.42.1
 transformers==5.22.1
-accelerate==1.15.0
+accelerate==1.16.0
 huggingface-hub==2.4.0
 safetensors==0.8.0
 numpy==1.26.4
